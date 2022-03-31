@@ -31,16 +31,16 @@ function divide(a, b) {
 
 function operate(op, a, b) {
     if(op == "+") {
-        return add(a,b);
+        return add(a,b).toString();
     }
     else if(op == "-") {
-        return subtract(a,b);
+        return subtract(a,b).toString();
     }
     else if(op == "*") {
-        return multiply(a,b);
+        return multiply(a,b).toString();
     }
     else if(op == "/") {
-        return divide(a,b);
+        return divide(a,b).toString();
     }
 }
 
@@ -55,7 +55,42 @@ function updateDisplay(newChar) {
         newChar = "";
     }
     input += newChar;
+
+    const pairWithOp = /^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/gm;
+    if(input.match(pairWithOp)) {
+        let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
+        let pair = input.substring(0, input.lastIndexOf(ops[1]));
+        let currentOperator = ops[0];
+        let arr = pair.split(currentOperator);
+
+        let result = operate(currentOperator, arr[0], arr[1]);
+
+
+        //console.log(result);
+    }
+
     display.textContent = input;
+}
+
+//caps precision to 6, returns the result but does not add precision
+function roundNumber(num) {
+    let decimalPlace = num.indexOf(".");
+    let result;
+
+    console.log(`Decimal place at ${decimalPlace} in ${num}`);
+
+    if(decimalPlace >= 0) {
+        //if it exceeds 6 decimal points, run toPrecision on it
+        if(num.length - decimalPlace - 1 > 6) {
+            let cappedNum = num.substring(0, num.length - decimalPlace);
+            console.log(`${num} capped to ${cappedNum}`)
+        }
+    }
+    else {
+        result = parseInt(num);
+    }
+
+    return result;
 }
 
 function applyListeners() {
