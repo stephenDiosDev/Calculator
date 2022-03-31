@@ -13,7 +13,11 @@
 */
 
 html, body {
-    height: 100%;
+    height: 100vh;
+    width: 100vw;
+
+    min-width: 600px;
+    min-height: 750px;
 }
 
 body {
@@ -33,7 +37,7 @@ body {
 }
 
 .header, .footer {
-    height: 5em;
+    height: 10%;
 }
 
 .header {
@@ -42,7 +46,7 @@ body {
 }
 
 .content {
-    height: 100%;
+    height: 80%;
     width: 100%;
     display: flex;
     flex-shrink: 0;
