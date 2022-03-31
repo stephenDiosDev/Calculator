@@ -46,8 +46,13 @@ function operate(op, a, b) {
 
 function updateDisplay(newChar) {
     let display = document.querySelector(".display-text");
-    if(input == "0") {
-        input = "";
+    if(newChar == "C") {
+        input = "0";
+        newChar = "";
+    }
+    else if(input == "0") {
+        input = newChar;
+        newChar = "";
     }
     input += newChar;
     display.textContent = input;
