@@ -1,8 +1,9 @@
 console.log("Hello, World!");
 
 //holds the input line from the calculator display
-let input = "0";
+let input = "";
 
+updateDisplay("0");
 applyListeners();
 
 
@@ -43,7 +44,14 @@ function operate(op, a, b) {
     }
 }
 
-//testOperators();
+function updateDisplay(newChar) {
+    let display = document.querySelector(".display-text");
+    if(input == "0") {
+        input = "";
+    }
+    input += newChar;
+    display.textContent = input;
+}
 
 function applyListeners() {
     let keypad = document.querySelector(".keypad");
@@ -57,6 +65,7 @@ function applyListeners() {
             if(node.localName == "button") {
                 node.addEventListener("mousedown", function(e) {
                     node.style.backgroundColor = "#999999";
+                    updateDisplay(node.textContent);
                 });
 
                 node.addEventListener("mouseup", function(e) {
