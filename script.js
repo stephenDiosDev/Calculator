@@ -3,6 +3,8 @@ console.log("Hello, World!");
 //holds the input line from the calculator display
 let input = "0";
 
+applyListeners();
+
 
 function add(a, b) {
     return a + b;
@@ -41,7 +43,31 @@ function operate(op, a, b) {
     }
 }
 
-testOperators();
+//testOperators();
+
+function applyListeners() {
+    let keypad = document.querySelector(".keypad");
+    let rows = keypad.getElementsByClassName("row");
+
+    //apply a listener that console logs the button text
+    for(let i = 0; i < rows.length; i++) {
+        let row = rows[i].childNodes;
+        
+        row.forEach(node => {
+            if(node.localName == "button") {
+                node.addEventListener("mousedown", function(e) {
+                    node.style.backgroundColor = "#999999";
+                });
+
+                node.addEventListener("mouseup", function(e) {
+                    node.style.backgroundColor = "#E5E5E5";
+                });
+
+            }
+        })
+    }
+
+}
 
 
 function testOperators() {

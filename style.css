@@ -56,12 +56,59 @@ body {
 
 .calculator {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    flex-direction: column;
     flex-shrink: 0;
     width: 30%;
     height: 80%;
     background-color: #4E4232;
+}
+
+.display, .keypad {
+    margin: 30px;
+    width: 90%;
+    background-color: #E5E5E5;
+}
+
+.display {
+    height: 20%;
+}
+
+.keypad {
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px;
+}
+
+.row {
+    width: 97%;
+    height: 20%;
+    margin: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    width: 25%;
+    height: 90%;
+    background-color: #E5E5E5;
+    border: 1px solid #4E4232;
+    border-radius: 5px;
+    margin: 3px;
+    font-size: larger;
+}
+
+.clear-btn {
+    width: 78%;
+}
+
+.zero-btn {
+    width: 52%;
 }
 
 .footer {
