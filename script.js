@@ -31,16 +31,16 @@ function divide(a, b) {
 
 function operate(op, a, b) {
     if(op == "+") {
-        return add(a,b).toString();
+        return add(a,b);
     }
     else if(op == "-") {
-        return subtract(a,b).toString();
+        return subtract(a,b);
     }
     else if(op == "*") {
-        return multiply(a,b).toString();
+        return multiply(a,b);
     }
     else if(op == "/") {
-        return divide(a,b).toString();
+        return divide(a,b);
     }
 }
 
@@ -63,10 +63,11 @@ function updateDisplay(newChar) {
         let currentOperator = ops[0];
         let arr = pair.split(currentOperator);
 
-        let result = operate(currentOperator, arr[0], arr[1]);
+        let result = operate(currentOperator, +arr[0], +arr[1]);
+        result = roundNumber(result);
+        console.log("Result: " + result);
 
-
-        //console.log(result);
+        input = result.toString();
     }
 
     display.textContent = input;
@@ -74,23 +75,7 @@ function updateDisplay(newChar) {
 
 //caps precision to 6, returns the result but does not add precision
 function roundNumber(num) {
-    let decimalPlace = num.indexOf(".");
-    let result;
-
-    console.log(`Decimal place at ${decimalPlace} in ${num}`);
-
-    if(decimalPlace >= 0) {
-        //if it exceeds 6 decimal points, run toPrecision on it
-        if(num.length - decimalPlace - 1 > 6) {
-            let cappedNum = num.substring(0, num.length - decimalPlace);
-            console.log(`${num} capped to ${cappedNum}`)
-        }
-    }
-    else {
-        result = parseInt(num);
-    }
-
-    return result;
+    return parseFloat(num.toFixed(6));
 }
 
 function applyListeners() {
