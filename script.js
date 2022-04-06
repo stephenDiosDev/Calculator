@@ -44,38 +44,76 @@ function operate(op, a, b) {
     }
 }
 
+//takes in an input string, returns number of digits
+function howManyDigits(num) {
+    let arr = [...num];
+
+    for(let i = 0; i < arr.length; i++) {
+        if(!isNan(parseInt(arr[i]))) {  //if a valid digit
+
+        }
+    }
+
+    console.log(arr);
+}
+
+/*
+        TODO
+            First get the display working in the iOS style where its one
+            number, then when we click an operator the display is cleared
+            so we only ever show one number!
+
+*/
 function updateDisplay(newChar) {
     let display = document.querySelector(".display-text");
     if(newChar == "C") {
         input = "0";
         newChar = "";
     }
-    else if(input == "0") {
+    else if(input == "0" && newChar.match(/[1-9]/)) {
         input = newChar;
         newChar = "";
     }
-    input += newChar;
 
-    const pairWithOp = /^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/gm;
-    if(input.match(pairWithOp)) {
-        let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
-        let pair = input.substring(0, input.lastIndexOf(ops[1]));
-        let currentOperator = ops[0];
-        let arr = pair.split(currentOperator);
-
-        let result = operate(currentOperator, +arr[0], +arr[1]);
-        result = roundNumber(result);
-        console.log("Result: " + result);
-
-        input = result.toString();
+    if(input.length == 8) {
+        console.log("8 CHARACTER LIMIT ON DISPLAY REACHED!");
     }
+    else if(input.length < 8) {
+        //decimal rules check
+        if(newChar == ".") {
+            if(input.includes(".")) {   //only want one decimal on display
+                newChar = "";
+            }
+            
+            //only want to add decimal if there is a number at the end of
+            //the input, otherwise we can add a 0 with the decimal
+        }
 
-    display.textContent = input;
+
+        input += newChar;
+
+        const pairWithOp = /^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/gm;
+        if(input.match(pairWithOp)) {
+            let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
+            let pair = input.substring(0, input.lastIndexOf(ops[1]));
+            let currentOperator = ops[0];
+            let arr = pair.split(currentOperator);
+
+            let result = operate(currentOperator, +arr[0], +arr[1]);
+            result = roundNumber(result);
+            console.log("Result: " + result);
+
+            input = result.toString();
+        }
+
+        display.textContent = input;
+    } 
 }
+
 
 //caps precision to 6, returns the result but does not add precision
 function roundNumber(num) {
-    return parseFloat(num.toFixed(6));
+    return parseFloat(num.toFixed(8));
 }
 
 function applyListeners() {

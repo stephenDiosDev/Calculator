@@ -78,12 +78,16 @@ body {
     align-items: center;
     font-size: 50px;
     font-family: "Lucida Console", "Courier New", monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
 }
 
 .display-text {
     margin: 0;
     padding-right: 5px;
     padding-left: 5px;
+    width: 100%;
 }
 
 .keypad {
