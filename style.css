@@ -60,8 +60,8 @@ body {
     align-items: center;
     flex-direction: column;
     flex-shrink: 0;
-    width: 30%;
-    height: 80%;
+    width: 400px;
+    height: 600px;
     background-color: #4E4232;
 }
 
@@ -76,8 +76,8 @@ body {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    font-size: 50px;
-    font-family: "Lucida Console", "Courier New", monospace;
+    font-size: 45px;
+    font-family: "Lucida Console","Lucida Sans Typewriter","monaco","Bitstream Vera Sans Mono",monospace;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
@@ -88,6 +88,7 @@ body {
     padding-right: 5px;
     padding-left: 5px;
     width: 100%;
+    text-align: right;
 }
 
 .keypad {
