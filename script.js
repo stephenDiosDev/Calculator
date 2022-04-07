@@ -44,24 +44,24 @@ function operate(op, a, b) {
     }
 }
 
-//takes in an input string, returns number of digits
-function howManyDigits(num) {
-    let arr = [...num];
-
-    for(let i = 0; i < arr.length; i++) {
-        if(!isNan(parseInt(arr[i]))) {  //if a valid digit
-
-        }
-    }
-
-    console.log(arr);
-}
-
 /*
         TODO
             First get the display working in the iOS style where its one
             number, then when we click an operator the display is cleared
             so we only ever show one number!
+
+
+    1. Enter first number
+    2. Clicking the operator makes the operator button glow, but original number
+        is still visible on calculator
+    3. If an operator is clicked, the operator simply switches function. If
+        a number is pressed, the display clears and the next number may be entered
+    4. Clicking any new operator will perform the calculation and display
+        the result. If we instead click a new number, it will throw out the 
+        result and essentially clear the inputs.
+    5. If at any point we only enter a number and operator and click a new op,
+        we take the number currently displayed (maybe next number should always
+            default to the displayed num)
 
 */
 function updateDisplay(newChar) {
@@ -124,16 +124,48 @@ function applyListeners() {
     for(let i = 0; i < rows.length; i++) {
         let row = rows[i].childNodes;
         
+        /*
+            Will need to applydifferent listeners for operators
+        */
         row.forEach(node => {
             if(node.localName == "button") {
-                node.addEventListener("mousedown", function(e) {
-                    node.style.backgroundColor = "#999999";
-                    updateDisplay(node.textContent);
-                });
+                if(node.textContent.match(/[/*\-+=]/)) {
+                    node.addEventListener("mousedown", function(e) {
+                        //go through all other operator nodes and 
+                        //turn their colour to normal
+                        for(let j = 0; j < rows.length; j++) {
+                            let jRow = rows[j].childNodes;
+                            jRow.forEach(jNode => {
+                                if(jNode.textContent.match(/[/*\-+=]/)) {
+                                    console.log("Resetting node colour");
+                                    jNode.style.backgroundColor = "#E5E5E5";
+                                }
+                            });
+                        }
 
-                node.addEventListener("mouseup", function(e) {
-                    node.style.backgroundColor = "#E5E5E5";
-                });
+                        //set colour for currently active operator
+                        console.log(node.textContent);
+                        node.style.backgroundColor = "#999999";
+                        
+                    });
+
+                    if(node.textContent.match(/[=]/)) {
+                        node.addEventListener("mouseup", function(e) {
+                            node.style.backgroundColor = "#E5E5E5";
+                        });
+                    }
+                }
+                else {
+                    node.addEventListener("mousedown", function(e) {
+                        node.style.backgroundColor = "#999999";
+                        updateDisplay(node.textContent);
+
+                    });
+    
+                    node.addEventListener("mouseup", function(e) {
+                        node.style.backgroundColor = "#E5E5E5";
+                    });
+                }
 
             }
         })
