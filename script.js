@@ -1,11 +1,10 @@
 console.log("Hello, World!");
 
 //holds the input line from the calculator display
-let input = "";
+let input = "0";
 
 let currentOperator = "";
-
-updateDisplay("0");
+updateDisplay();
 applyListeners();
 
 
@@ -82,54 +81,159 @@ function operate(op, a, b) {
             default to the displayed num)
 
 */
-function updateDisplay(newChar) {
-    let display = document.querySelector(".display-text");
-    if (newChar == "C") {   //clear input
+
+function processInput(newChar) {
+    if (newChar.match(/[C]/)) {   //clear input
         input = "0";
         newChar = "";
     }
-    //if display has 0 in it and newChar is num, overwrite 0
-    else if (input == "0" && newChar.match(/[1-9]/)) {
-        input = newChar;
-        newChar = "";
-    }
-
-    //block longer than 8 digits
-    if (input.length == 8) {
-        console.log("8 CHARACTER LIMIT ON DISPLAY REACHED!");
-    }
-
-    else if (input.length < 8) {
-        //decimal rules check
-        if (newChar == ".") {
-            if (input.includes(".")) {   //only want one decimal on display
-                newChar = "";
+    else if (newChar.match(/[*\-+=\/]/)) {    //operator
+        if (newChar.match(/[=]/)) {  //if currentOp is equals
+            //sanity check that the expression in input is valid
+            input += newChar;
+            let expression = extractExpression();
+            console.log("Current Input: " + input);
+            console.log("Expression: " + expression);
+            if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/)) {
+                //send this to operate
+                let expression = extractExpression();
+                let result = operate(expression[0], expression[1], expression[2]);
+                input = result;
+                console.log("Current input: " + input);
             }
-
-            //only want to add decimal if there is a number at the end of
-            //the input, otherwise we can add a 0 with the decimal
+            else {
+                console.log("Error: Invalid expression");
+            }
         }
-
-
-        input += newChar;
-
-        const pairWithOp = /^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/gm;
-        if (input.match(pairWithOp)) {
-            let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
-            let pair = input.substring(0, input.lastIndexOf(ops[1]));
-            let op = ops[0];
-            let arr = pair.split(op);
-
-            let result = operate(op, +arr[0], +arr[1]);
-            result = roundNumber(result);
-            console.log("Result: " + result);
-
-            input = result.toString();
+        else {      //other operator logic
+            if (input.match(/[*\-+\/]/) == null) { //no other ops in input
+                if (input.match(/[0-9]$/)) { //last char of input is number
+                    input += newChar;
+                }
+                else if (input.match(/[.]$/)) {  //last char of input is decimal
+                    //pad a 0 so we get 1.0 instead of 1._ for ex
+                    input += "0" + newChar;
+                }
+            }
         }
-
-        display.textContent = input;
     }
+    else if (newChar.match(/[0-9.]/)) {     //number and decimal
+        if (input.length < 8) {          //enforce 8 character limit
+            if (newChar.match(/[0-9]/)) {
+                if (input.match(/^[0]$/)) {  //only 1 zero
+                    input = newChar;
+                }
+                else if (input.match(/[1-9]/)) { //non-zero
+                    input += newChar;
+                }
+            }
+            //if newChar is decimal and we don't have a decimal yet
+            else if (newChar.match(/[.]/) && input.match(/[.]/) == null) {
+                input += newChar;
+            }
+        }
+    }
+
+    updateDisplay();
 }
+
+function extractExpression() {
+    let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
+    let pair = input.substring(0, input.lastIndexOf(ops[1]));
+    let arr = pair.split(ops[0]);
+
+    return [ops[0], parseFloat(arr[0]), parseFloat(arr[1])];
+}
+
+function updateDisplay() {
+    let display = document.querySelector(".display-text");
+    display.textContent = input;
+}
+
+// function updateDisplay(newChar) {
+//     /*
+//         Given any input:
+//             1. Check if it is to clear since this is the simplest case
+//             2. Else if, check if input is an operator
+//                 2a. If operator
+//                     2ab. Check to make sure we don't have other ops in the input
+//                         2ac. If end of input is number
+//                             2aca. Add operator
+//                         2ad. If end of input is decimal
+//                             2ae. Add a decimal and then add operator
+
+
+
+
+
+
+//             3. Else, it is a number/decimal
+//                 3a. Check to make sure input is within 8 digits
+//                     3ab. If newChar is number
+//                         3aba. If existing input is 0, replace with newChar
+//                         3abb. If existing input is nonzero, add newChar
+//                     3ac. Else if newChar is decimal, add decimal
+//                         (zero will always be default, so there will always
+//                             be a zero in the input at minimum)
+//                 3b. if input is 8 digits, do nothing
+
+//             Once the above 3 logic blocks are done, updateDisplay
+//     */
+
+
+
+
+
+
+
+
+//     // let display = document.querySelector(".display-text");
+//     // if (newChar == "C") {   //clear input
+//     //     input = "0";
+//     //     newChar = "";
+//     // }
+//     //if display has 0 in it and newChar is num, overwrite 0
+//     else if (input == "0" && newChar.match(/[1-9]/)) {
+//         input = newChar;
+//         newChar = "";
+//     }
+
+//     //block longer than 8 digits
+//     if (input.length == 8) {
+//         console.log("8 CHARACTER LIMIT ON DISPLAY REACHED!");
+//     }
+
+//     else if (input.length < 8) {
+//         //decimal rules check
+//         if (newChar == ".") {
+//             if (input.includes(".")) {   //only want one decimal on display
+//                 newChar = "";
+//             }
+
+//             //only want to add decimal if there is a number at the end of
+//             //the input, otherwise we can add a 0 with the decimal
+//         }
+
+
+//         input += newChar;
+
+//         const pairWithOp = /^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/gm;
+//         if (input.match(pairWithOp)) {
+//             let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
+//             let pair = input.substring(0, input.lastIndexOf(ops[1]));
+//             let op = ops[0];
+//             let arr = pair.split(op);
+
+//             let result = operate(op, +arr[0], +arr[1]);
+//             result = roundNumber(result);
+//             console.log("Result: " + result);
+
+//             input = result.toString();
+//         }
+
+//         display.textContent = input;
+//     }
+// }
 
 
 //caps precision to 6, returns the result but does not add precision
@@ -168,7 +272,7 @@ function applyListeners() {
                         //set colour for currently active operator
                         currentOperator = node.textContent;
                         node.style.backgroundColor = "#999999";
-                        updateDisplay(node.textContent);
+                        processInput(node.textContent);
 
                     });
 
@@ -183,7 +287,7 @@ function applyListeners() {
                     node.addEventListener("mousedown", function (e) {
                         clearOperatorColours(rows);
                         node.style.backgroundColor = "#999999";
-                        updateDisplay(node.textContent);
+                        processInput(node.textContent);
 
                     });
 
@@ -194,7 +298,7 @@ function applyListeners() {
                 else {
                     node.addEventListener("mousedown", function (e) {
                         node.style.backgroundColor = "#999999";
-                        updateDisplay(node.textContent);
+                        processInput(node.textContent);
 
                     });
 
