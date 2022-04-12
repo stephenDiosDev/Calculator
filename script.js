@@ -82,6 +82,7 @@ function operate(op, a, b) {
 
 */
 
+//handles the logic of inputs and calculator rules
 function processInput(newChar) {
     if (newChar.match(/[C]/)) {   //clear input
         input = "0";
@@ -94,12 +95,13 @@ function processInput(newChar) {
             let expression = extractExpression();
             console.log("Current Input: " + input);
             console.log("Expression: " + expression);
+            //check that the expression is valid before evaluating
             if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/)) {
                 //send this to operate
                 let expression = extractExpression();
                 let result = operate(expression[0], expression[1], expression[2]);
-                input = result;
-                console.log("Current input: " + input);
+                input = result.toString();
+                console.log("Result: " + result);
             }
             else {
                 console.log("Error: Invalid expression");
@@ -128,7 +130,8 @@ function processInput(newChar) {
                 }
             }
             //if newChar is decimal and we don't have a decimal yet
-            else if (newChar.match(/[.]/) && input.match(/[.]/) == null) {
+            //todo: change this to check extractRenderableText instead of input for double decimals
+            else if (newChar.match(/[.]/) && extractRenderableText().match(/[.]/) == null) {
                 input += newChar;
             }
         }
@@ -145,48 +148,37 @@ function extractExpression() {
     return [ops[0], parseFloat(arr[0]), parseFloat(arr[1])];
 }
 
+//returns only the number from the expression that is rendered currently
+function extractRenderableText() {
+   let result = "";
+
+    //an expression like a ^ b where a and b are valid numbers and ^ is any valid operator
+    if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*$/)) {
+        //only render the number to the right
+        let op = input.match(/[+\-*\/]/);
+        let opIndex = input.indexOf(op[0]);
+        result = input.substring(opIndex + 1);
+    }
+    //an expression like a ^ where a is a valid number and ^ is any valid operator
+    else if(input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}$/)) {
+        result = input.substring(0, input.length - 1);
+    }
+    //an expression like a where a is a valid number
+    else if (input.match(/^[0-9]+[.]?[0-9]*$/)) {
+        result = input;
+    }
+
+    return result;
+}
+
+//handles the rendering logic only, anything in the display will be valid when this gets called
 function updateDisplay() {
     let display = document.querySelector(".display-text");
-    display.textContent = input;
+    let renderText = extractRenderableText();
+    display.textContent = renderText;
 }
 
 // function updateDisplay(newChar) {
-//     /*
-//         Given any input:
-//             1. Check if it is to clear since this is the simplest case
-//             2. Else if, check if input is an operator
-//                 2a. If operator
-//                     2ab. Check to make sure we don't have other ops in the input
-//                         2ac. If end of input is number
-//                             2aca. Add operator
-//                         2ad. If end of input is decimal
-//                             2ae. Add a decimal and then add operator
-
-
-
-
-
-
-//             3. Else, it is a number/decimal
-//                 3a. Check to make sure input is within 8 digits
-//                     3ab. If newChar is number
-//                         3aba. If existing input is 0, replace with newChar
-//                         3abb. If existing input is nonzero, add newChar
-//                     3ac. Else if newChar is decimal, add decimal
-//                         (zero will always be default, so there will always
-//                             be a zero in the input at minimum)
-//                 3b. if input is 8 digits, do nothing
-
-//             Once the above 3 logic blocks are done, updateDisplay
-//     */
-
-
-
-
-
-
-
-
 //     // let display = document.querySelector(".display-text");
 //     // if (newChar == "C") {   //clear input
 //     //     input = "0";
