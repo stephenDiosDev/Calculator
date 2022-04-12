@@ -96,12 +96,14 @@ function processInput(newChar) {
             console.log("Current Input: " + input);
             console.log("Expression: " + expression);
             //check that the expression is valid before evaluating
+            //todo: refactor this regex since it allows operator chaining at the end
             if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/)) {
                 //send this to operate
                 let expression = extractExpression();
                 let result = operate(expression[0], expression[1], expression[2]);
                 input = result.toString();
                 console.log("Result: " + result);
+                console.log("Current Input: " + input);
             }
             else {
                 console.log("Error: Invalid expression");
@@ -115,6 +117,17 @@ function processInput(newChar) {
                 else if (input.match(/[.]$/)) {  //last char of input is decimal
                     //pad a 0 so we get 1.0 instead of 1._ for ex
                     input += "0" + newChar;
+                }
+            }
+            else {  //another operator exists, ensure input is valid before continuing
+                if(input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*$/)) {  //checks for a ^ b
+                    input += "=";
+                    //send this to operate
+                    let expression = extractExpression();
+                    let result = operate(expression[0], expression[1], expression[2]);
+                    input = result.toString() + newChar;
+                    console.log("Result: " + result);
+                    console.log("Current Input: " + input);
                 }
             }
         }
