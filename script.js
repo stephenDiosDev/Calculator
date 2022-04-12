@@ -1,11 +1,10 @@
 console.log("Hello, World!");
 
 //holds the input line from the calculator display
-let input = "";
+let input = "0";
 
 let currentOperator = "";
-
-updateDisplay("0");
+updateDisplay();
 applyListeners();
 
 
@@ -82,57 +81,116 @@ function operate(op, a, b) {
             default to the displayed num)
 
 */
-function updateDisplay(newChar) {
-    let display = document.querySelector(".display-text");
-    if (newChar == "C") {   //clear input
+
+//handles the logic of inputs and calculator rules
+function processInput(newChar) {
+    if (newChar.match(/[C]/)) {   //clear input
         input = "0";
         newChar = "";
     }
-    //if display has 0 in it and newChar is num, overwrite 0
-    else if (input == "0" && newChar.match(/[1-9]/)) {
-        input = newChar;
-        newChar = "";
-    }
-
-    //block longer than 8 digits
-    if (input.length == 8) {
-        console.log("8 CHARACTER LIMIT ON DISPLAY REACHED!");
-    }
-
-    else if (input.length < 8) {
-        //decimal rules check
-        if (newChar == ".") {
-            if (input.includes(".")) {   //only want one decimal on display
-                newChar = "";
+    else if (newChar.match(/[*\-+=\/]/)) {    //operator
+        if (newChar.match(/[=]/)) {  //if currentOp is equals
+            //sanity check that the expression in input is valid
+            input += newChar;
+            let expression = extractExpression();
+            console.log("Current Input: " + input);
+            console.log("Expression: " + expression);
+            //check that the expression is valid before evaluating
+            if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[=]{1}$/)) {
+                //send this to operate
+                let expression = extractExpression();
+                let result = operate(expression[0], expression[1], expression[2]);
+                input = result.toString();
+                console.log("Result: " + result);
+                console.log("Current Input: " + input);
             }
-
-            //only want to add decimal if there is a number at the end of
-            //the input, otherwise we can add a 0 with the decimal
+            else {
+                console.log("Error: Invalid expression");
+            }
         }
-
-
-        input += newChar;
-
-        const pairWithOp = /^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/gm;
-        if (input.match(pairWithOp)) {
-            let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
-            let pair = input.substring(0, input.lastIndexOf(ops[1]));
-            let op = ops[0];
-            let arr = pair.split(op);
-
-            let result = operate(op, +arr[0], +arr[1]);
-            result = roundNumber(result);
-            console.log("Result: " + result);
-
-            input = result.toString();
+        else {      //other operator logic
+            if (input.match(/[*\-+\/]/) == null) { //no other ops in input
+                if (input.match(/[0-9]$/)) { //last char of input is number
+                    input += newChar;
+                }
+                else if (input.match(/[.]$/)) {  //last char of input is decimal
+                    //pad a 0 so we get 1.0 instead of 1._ for ex
+                    input += "0" + newChar;
+                }
+            }
+            else {  //another operator exists, ensure input is valid before continuing
+                if(input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*$/)) {  //checks for a ^ b
+                    input += "=";
+                    //send this to operate
+                    let expression = extractExpression();
+                    let result = operate(expression[0], expression[1], expression[2]);
+                    input = result.toString() + newChar;    //now input is a ^ which is valid to render
+                    console.log("Result: " + result);
+                    console.log("Current Input: " + input);
+                }
+            }
         }
-
-        display.textContent = input;
     }
+    else if (newChar.match(/[0-9.]/)) {     //number and decimal
+        if (input.length < 8) {          //enforce 8 character limit
+            if (newChar.match(/[0-9]/)) {
+                if (input.match(/^[0]$/)) {  //only 1 zero
+                    input = newChar;
+                }
+                else if (input.match(/[1-9]/)) { //non-zero
+                    input += newChar;
+                }
+            }
+            //if newChar is decimal and we don't have a decimal yet
+            else if (newChar.match(/[.]/) && extractRenderableText().match(/[.]/) == null) {
+                input += newChar;
+            }
+        }
+    }
+
+    updateDisplay();
+}
+
+function extractExpression() {
+    let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
+    let pair = input.substring(0, input.lastIndexOf(ops[1]));
+    let arr = pair.split(ops[0]);
+
+    return [ops[0], parseFloat(arr[0]), parseFloat(arr[1])];
+}
+
+//returns only the number from the expression that is rendered currently
+function extractRenderableText() {
+   let result = "";
+
+    //an expression like a ^ b where a and b are valid numbers and ^ is any valid operator
+    if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*$/)) {
+        //only render the number to the right
+        let op = input.match(/[+\-*\/]/);
+        let opIndex = input.indexOf(op[0]);
+        result = input.substring(opIndex + 1);
+    }
+    //an expression like a ^ where a is a valid number and ^ is any valid operator
+    else if(input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}$/)) {
+        result = input.substring(0, input.length - 1);
+    }
+    //an expression like a where a is a valid number
+    else if (input.match(/^[0-9]+[.]?[0-9]*$/)) {
+        result = input;
+    }
+
+    return result;
+}
+
+//handles the rendering logic only, anything in the display will be valid when this gets called
+function updateDisplay() {
+    let display = document.querySelector(".display-text");
+    let renderText = extractRenderableText();
+    display.textContent = renderText;
 }
 
 
-//caps precision to 6, returns the result but does not add precision
+//caps precision to 8, returns the result but does not add precision
 function roundNumber(num) {
     return parseFloat(num.toFixed(8));
 }
@@ -168,7 +226,7 @@ function applyListeners() {
                         //set colour for currently active operator
                         currentOperator = node.textContent;
                         node.style.backgroundColor = "#999999";
-                        updateDisplay(node.textContent);
+                        processInput(node.textContent);
 
                     });
 
@@ -183,7 +241,7 @@ function applyListeners() {
                     node.addEventListener("mousedown", function (e) {
                         clearOperatorColours(rows);
                         node.style.backgroundColor = "#999999";
-                        updateDisplay(node.textContent);
+                        processInput(node.textContent);
 
                     });
 
@@ -194,7 +252,7 @@ function applyListeners() {
                 else {
                     node.addEventListener("mousedown", function (e) {
                         node.style.backgroundColor = "#999999";
-                        updateDisplay(node.textContent);
+                        processInput(node.textContent);
 
                     });
 
