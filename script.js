@@ -96,8 +96,7 @@ function processInput(newChar) {
             console.log("Current Input: " + input);
             console.log("Expression: " + expression);
             //check that the expression is valid before evaluating
-            //todo: refactor this regex since it allows operator chaining at the end
-            if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/)) {
+            if (input.match(/^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[=]{1}$/)) {
                 //send this to operate
                 let expression = extractExpression();
                 let result = operate(expression[0], expression[1], expression[2]);
@@ -125,7 +124,7 @@ function processInput(newChar) {
                     //send this to operate
                     let expression = extractExpression();
                     let result = operate(expression[0], expression[1], expression[2]);
-                    input = result.toString() + newChar;
+                    input = result.toString() + newChar;    //now input is a ^ which is valid to render
                     console.log("Result: " + result);
                     console.log("Current Input: " + input);
                 }
@@ -143,7 +142,6 @@ function processInput(newChar) {
                 }
             }
             //if newChar is decimal and we don't have a decimal yet
-            //todo: change this to check extractRenderableText instead of input for double decimals
             else if (newChar.match(/[.]/) && extractRenderableText().match(/[.]/) == null) {
                 input += newChar;
             }
@@ -191,57 +189,8 @@ function updateDisplay() {
     display.textContent = renderText;
 }
 
-// function updateDisplay(newChar) {
-//     // let display = document.querySelector(".display-text");
-//     // if (newChar == "C") {   //clear input
-//     //     input = "0";
-//     //     newChar = "";
-//     // }
-//     //if display has 0 in it and newChar is num, overwrite 0
-//     else if (input == "0" && newChar.match(/[1-9]/)) {
-//         input = newChar;
-//         newChar = "";
-//     }
 
-//     //block longer than 8 digits
-//     if (input.length == 8) {
-//         console.log("8 CHARACTER LIMIT ON DISPLAY REACHED!");
-//     }
-
-//     else if (input.length < 8) {
-//         //decimal rules check
-//         if (newChar == ".") {
-//             if (input.includes(".")) {   //only want one decimal on display
-//                 newChar = "";
-//             }
-
-//             //only want to add decimal if there is a number at the end of
-//             //the input, otherwise we can add a 0 with the decimal
-//         }
-
-
-//         input += newChar;
-
-//         const pairWithOp = /^[0-9]+[.]?[0-9]*[+\-*\/]{1}[0-9]+[.]?[0-9]*[+\-*\/=]{1}$/gm;
-//         if (input.match(pairWithOp)) {
-//             let ops = input.match(/[+\-*\/=]/gm);   //both ops in calculator
-//             let pair = input.substring(0, input.lastIndexOf(ops[1]));
-//             let op = ops[0];
-//             let arr = pair.split(op);
-
-//             let result = operate(op, +arr[0], +arr[1]);
-//             result = roundNumber(result);
-//             console.log("Result: " + result);
-
-//             input = result.toString();
-//         }
-
-//         display.textContent = input;
-//     }
-// }
-
-
-//caps precision to 6, returns the result but does not add precision
+//caps precision to 8, returns the result but does not add precision
 function roundNumber(num) {
     return parseFloat(num.toFixed(8));
 }
